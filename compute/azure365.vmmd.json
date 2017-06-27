@@ -1,0 +1,142 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+
+  "parameters": {
+    "vmSize": {
+      "type": "string",
+      "metadata": { "description": "Web vmSize" }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": { "description": "Web Node name Prefix" }
+    },
+    "localAdmin": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin Username"
+      }
+    },
+    "localAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password"
+      }
+    },
+    "nicName": {
+      "type": "string",
+      "metadata": { "description": "NIC ID" }
+    },
+
+    "osDiskSAType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": { "description": "OS Disk Storage Account type " }
+    },
+    "addDataDiskType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": { "description": "Additional Data Disk Storage Account type " }
+    },
+    "osDiskSize": {
+      "type": "int",
+      "allowedValues": [
+        32,
+        64,
+        128,
+        512,
+        1024
+      ],
+      "defaultValue": 128,
+      "metadata": { "description": "C drive disk size" }
+    },
+    "addDataDiskSize": {
+      "type": "int",
+      "allowedValues": [
+        32,
+        64,
+        128,
+        512,
+        1024
+      ],
+      "defaultValue": 32,
+      "metadata": { "description": "Additional Datadisk Size" }
+    },
+    "imagePublisher": {
+      "type": "string",
+      "defaultValue": "MicrosoftWindowsServer",
+      "metadata": { "description": "imagePublisher" }
+    },
+    "imageOffer": {
+      "type": "string",
+      "defaultValue": "WindowsServer",
+      "metadata": { "description": "imageOffer" }
+    },
+    "imageSKU": {
+      "type": "string",
+      "defaultValue": "2012-R2-Datacenter",
+      "metadata": { "description": "imageSKU" }
+    },
+    "avlSetName": {
+      "type": "string",
+      "metadata": { "description": "Availability Set" }
+    }  
+  },
+  "variables": {
+    
+  },
+  "resources": [
+    {
+      "name": "[parameters('vmName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [],
+      "properties": {
+        "osProfile": {
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('localAdmin')]",
+          "adminPassword": "[parameters('localAdminPassword')]",
+          "windowsConfiguration": {
+            "provisionVmAgent": "true"
+          }
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('vmName'),'-osdisk')]",
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('osDiskSAType')]"
+            },
+            "caching": "ReadWrite",
+            "osType": "Windows",
+            "diskSizeGB": "[parameters('osDiskSize')]"
+          },
+          "dataDisks": [
+            {
+              "createOption": "Empty",
+              "name": "[concat(parameters('vmName'),'-datadisk')]",
+              "lun": 1,
+              "diskSizeGB": "[parameters('addDataDiskSize')]",
+              "caching": "None",
+              "managedDisk": { "storageAccountType": "[parameters('addDataDiskType')]" }
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [ { "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('nicName'))]" } ]
+        },
+        "availabilitySet": { "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('avlSetName'))]" }       
+      }
+    }
+  ]
+}
