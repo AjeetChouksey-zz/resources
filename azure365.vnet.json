@@ -1,0 +1,44 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "type": "string",
+      "metadata": { "description": "VNET Name" }
+    },
+    "vnetAddressRange": {
+      "type": "string",
+      "metadata": { "description": "VNET Address Range" }
+    },
+    "subnets": {
+      "type": "array",
+      "metadata": { "description": "subnets" }
+    }
+  },
+  "variables": {
+   
+  },
+  "resources": [
+    {
+      "name": "[parameters('vnetName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "comment":"Create VNET along with Subnet",
+      "apiVersion": "2015-06-15",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressRange')]"
+          ]
+        },
+        "subnets": "[parameters('subnets')]"
+      }
+    }
+  ],
+  "outputs": {
+    "vnetReference": {
+      "type": "string",
+      "value": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',parameters('vnetName'))]"
+    }
+  }
+}
