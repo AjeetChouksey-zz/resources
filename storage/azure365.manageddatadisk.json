@@ -1,0 +1,47 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dataDiskSizeGB": {
+      "type": "int",
+      "defaultValue": 500,
+      "metadata": { "description": "Additional Data Disk Size" }
+    },
+    "saType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": { "description": "Storage Account type " }
+    },
+    "saName": {
+      "type": "string",
+      "defaultValue": "AdditionalDataDisk",
+      "metadata": { "description": "Storage Account type " }
+    }
+  },
+  "variables": {
+    "Copyright": "Avanade, 'Modern Engineering Platform' Copyright, (c) 2016. All rights reserved."
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('saName')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "comments": "Create Addition Data Disk",
+      "properties": {
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "accountType": "[parameters('saType')]",
+        "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+        "osType": "Windows"
+      }
+    }
+  ],
+  "outputs": {
+    "addDiskResID": {
+      "type": "array",
+      "value": "[resourceId('Microsoft.Compute/disk',parameters('saName'))]"
+    }
+  }
+}
