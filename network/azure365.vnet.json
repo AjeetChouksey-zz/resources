@@ -16,14 +16,13 @@
     }
   },
   "variables": {
-   
+ 
   },
   "resources": [
     {
       "name": "[parameters('vnetName')]",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
-      "comment":"Create VNET along with Subnet",
       "apiVersion": "2015-06-15",
       "properties": {
         "addressSpace": {
